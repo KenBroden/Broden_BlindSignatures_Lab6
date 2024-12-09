@@ -1,4 +1,5 @@
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 
 public class LotteryAdmin {
     // Big Integers needed
@@ -56,8 +57,14 @@ public class LotteryAdmin {
         return signature.modPow(e, n).equals(num);
     }
 
-    // Hash a string
-    public static BigInteger hashString(String input) {
-        return new BigInteger(input.getBytes());
+    // // Hash a string
+    // public static BigInteger hashString(String input) {
+    //     return new BigInteger(input.getBytes());
+    // }
+
+    public static BigInteger hashString(String input) throws NoSuchAlgorithmException {
+        java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+        byte[] messageDigest = md.digest(input.getBytes());
+        return new BigInteger(1, messageDigest);
     }
 }

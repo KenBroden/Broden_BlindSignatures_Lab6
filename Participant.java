@@ -1,12 +1,13 @@
 import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class Participant {
-
-    private BigInteger num, blindNum, signature, r;
+    private BigInteger num, blindNum, blindingFactor;
 
     // Getter
-    public BigInteger getR() {
-        return r;
+    public BigInteger getBlindNum() {
+        return blindNum;
     }
 
     // Choose a number
@@ -16,18 +17,24 @@ public class Participant {
 
     // Blind the number
     public void blindNumber(BigInteger e, BigInteger n) {
-        blindNum = num.modPow(e, n);
+        blindingFactor = new BigInteger(n.bitLength(), new java.util.Random()).mod(n);
+        blindNum = num.multiply(blindingFactor.modPow(e, n)).mod(n);
     }
 
-    // Unblind the number
-    public void unblindNumber(BigInteger d, BigInteger n) {
-        r = blindNum.modPow(d, n);
+    // Unblind the signature
+    public BigInteger unblindSignature(BigInteger signature, BigInteger n) {
+        return signature.multiply(blindingFactor.modInverse(n)).mod(n);
     }
 
     // Verify the signature
-    public boolean verifySignature(BigInteger e, BigInteger n) {
-        signature = r.modPow(e, n);
-        return signature.equals(num);
+    public boolean verifySignature(BigInteger unblindedSignature, BigInteger e, BigInteger n) {
+        return unblindedSignature.modPow(e, n).equals(num);
     }
-    
+
+    // Hash a string
+    public static BigInteger hashString(String input) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] hash = md.digest(input.getBytes());
+        return new BigInteger(1, hash);
+    }
 }
