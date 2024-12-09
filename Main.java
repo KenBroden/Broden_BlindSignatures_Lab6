@@ -43,5 +43,15 @@ public class Main {
         } catch (Exception e) {
             System.out.println("Error while verifying name signature: " + e);
         }
+
+        // Demonstrate verification of an incorrect signed number
+        try {
+            BigInteger incorrectNumber = new BigInteger("1234567890"); // An incorrect number
+            BigInteger incorrectSignature = admin.sign(incorrectNumber);
+            boolean incorrectVerified = participant.verifySignature(incorrectSignature, admin.getE(), admin.getN());
+            System.out.println("Incorrect number signature verified: " + incorrectVerified);
+        } catch (Exception e) {
+            System.out.println("Error while verifying incorrect number signature: " + e);
+        }
     }
 }
